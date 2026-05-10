@@ -59,6 +59,13 @@ export interface TimelineProps<TData = unknown> {
   zoomMaxPct?: number;
 
   /**
+   * Multiplier applied per zoom step — toolbar `+` / `−` buttons and
+   * each `⌘`/`Ctrl` + wheel tick. `1.2` (default) = 20 % per step;
+   * `1.5` = chunkier; `1.05` = smoother. Must be > 1.
+   */
+  zoomFactor?: number;
+
+  /**
    * When `true`, rows are computed once at fit-zoom and never change
    * on zoom — items keep the same row at every zoom level. When
    * `false` (default), rows are recomputed at the current zoom, so

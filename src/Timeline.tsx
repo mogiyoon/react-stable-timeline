@@ -19,7 +19,7 @@ const ROW_HEIGHT = LABEL_HEIGHT + DOT_HEIGHT;
 const ROW_GAP = 8;
 const AXIS_HEIGHT = 28;
 const PAN_BUTTON = 0;
-const ZOOM_FACTOR = 1.2;
+const DEFAULT_zoomFactor = 1.2;
 const DRAG_PX = 4;
 
 const DEFAULT_ACCENT = "#6c8cff";
@@ -43,6 +43,7 @@ export function Timeline<TData = unknown>({
   hideToolbar = false,
   zoomMinPct = 100,
   zoomMaxPct = 5000,
+  zoomFactor = DEFAULT_zoomFactor,
   zoomStable = false,
   className,
   style,
@@ -208,7 +209,7 @@ export function Timeline<TData = unknown>({
         const cursorX = e.clientX - rect.left;
         const cursorTime =
           viewportStart + (cursorX / canvasPx) * viewportSpan;
-        const factor = e.deltaY > 0 ? ZOOM_FACTOR : 1 / ZOOM_FACTOR;
+        const factor = e.deltaY > 0 ? zoomFactor : 1 / zoomFactor;
         const newSpan = viewportSpan * factor;
         const newStart = cursorTime - (cursorX / canvasPx) * newSpan;
         setViewport(newStart, newStart + newSpan);
@@ -221,7 +222,7 @@ export function Timeline<TData = unknown>({
       const dt = (horizontalDelta / canvasPx) * viewportSpan;
       setViewport(viewportStart + dt, viewportEnd + dt);
     },
-    [viewportStart, viewportEnd, viewportSpan, canvasPx, setViewport],
+    [viewportStart, viewportEnd, viewportSpan, canvasPx, zoomFactor, setViewport],
   );
 
   const handleItemClick = useCallback(
@@ -257,14 +258,14 @@ export function Timeline<TData = unknown>({
   }, [fitWindow, setViewport]);
   const handleZoomIn = useCallback(() => {
     const center = (viewportStart + viewportEnd) / 2;
-    const newSpan = viewportSpan / ZOOM_FACTOR;
+    const newSpan = viewportSpan / zoomFactor;
     setViewport(center - newSpan / 2, center + newSpan / 2);
-  }, [viewportStart, viewportEnd, viewportSpan, setViewport]);
+  }, [viewportStart, viewportEnd, viewportSpan, zoomFactor, setViewport]);
   const handleZoomOut = useCallback(() => {
     const center = (viewportStart + viewportEnd) / 2;
-    const newSpan = viewportSpan * ZOOM_FACTOR;
+    const newSpan = viewportSpan * zoomFactor;
     setViewport(center - newSpan / 2, center + newSpan / 2);
-  }, [viewportStart, viewportEnd, viewportSpan, setViewport]);
+  }, [viewportStart, viewportEnd, viewportSpan, zoomFactor, setViewport]);
 
   const zoomPct = useMemo(() => {
     if (!fitWindow || viewportSpan <= 0) return 100;
