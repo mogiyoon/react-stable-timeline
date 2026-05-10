@@ -23,31 +23,106 @@ Peer deps: `react >= 18`, `react-dom >= 18`.
 
 ## Usage
 
+A complete example with typed items, range bars, per-item colors, a selection state, and a "now" cursor:
+
+```tsx
+import { useState } from "react";
+import {
+  Timeline,
+  type TimelineItem,
+} from "@mogiyoon/react-stable-timeline";
+
+interface EventMeta {
+  category: "milestone" | "release" | "ops";
+  description: string;
+}
+
+const items: TimelineItem<EventMeta>[] = [
+  {
+    id: "kickoff",
+    label: "Project kickoff",
+    start: Date.parse("2025-01-15"),
+    color: "#f59e0b",
+    data: { category: "milestone", description: "Scope alignment + design mockups" },
+  },
+  {
+    id: "alpha",
+    label: "Alpha build",
+    start: Date.parse("2025-02-20"),
+    end: Date.parse("2025-03-10"),
+    data: { category: "release", description: "First build for internal QA" },
+  },
+  {
+    id: "beta",
+    label: "Beta release",
+    start: Date.parse("2025-04-01"),
+    end: Date.parse("2025-06-30"),
+    color: "#10b981",
+    data: { category: "release", description: "Invite-based external testing" },
+  },
+  {
+    id: "launch",
+    label: "Official launch 🚀",
+    start: Date.parse("2025-09-12"),
+    color: "#ef4444",
+    data: { category: "milestone", description: "Press announcement + blog post" },
+  },
+];
+
+export function App() {
+  const [selected, setSelected] = useState<TimelineItem<EventMeta> | null>(null);
+
+  return (
+    <div style={{ padding: 24, maxWidth: 1100, margin: "0 auto" }}>
+      <div
+        style={{
+          height: 420,
+          border: "1px solid #e5e7eb",
+          borderRadius: 12,
+          overflow: "hidden",
+        }}
+      >
+        <Timeline<EventMeta>
+          items={items}
+          accentColor="#6c8cff"
+          cursorMs={Date.now()}
+          onSelect={setSelected}
+        />
+      </div>
+
+      {selected && (
+        <div style={{ marginTop: 16 }}>
+          <strong>{selected.label}</strong> — {selected.data?.description}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+A runnable version of this example lives at [`react-stable-timeline-example`](../react-stable-timeline-example) (Vite + React 19 + TS, with localized toolbar labels and a detail panel).
+
+### Minimal setup
+
+If you just want to drop a timeline in:
+
 ```tsx
 import { Timeline, type TimelineItem } from "@mogiyoon/react-stable-timeline";
 
 const items: TimelineItem[] = [
-  { id: "1", label: "프로젝트 시작", start: Date.parse("2025-01-15") },
+  { id: "1", label: "Kickoff", start: Date.parse("2025-01-15") },
   {
     id: "2",
-    label: "베타 릴리즈",
+    label: "Beta",
     start: Date.parse("2025-04-01"),
     end: Date.parse("2025-06-30"),
   },
-  { id: "3", label: "정식 출시", start: Date.parse("2025-09-12") },
+  { id: "3", label: "Launch", start: Date.parse("2025-09-12") },
 ];
 
-export function App() {
-  return (
-    <div style={{ height: 400 }}>
-      <Timeline
-        items={items}
-        accentColor="#6c8cff"
-        onSelect={(item) => console.log("clicked", item)}
-      />
-    </div>
-  );
-}
+<div style={{ height: 400 }}>
+  <Timeline items={items} />
+</div>;
 ```
 
 ## Controlled viewport
