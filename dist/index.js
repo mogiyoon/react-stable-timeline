@@ -611,7 +611,7 @@ function useViewport({
   );
   const setViewport = useCallback(
     (start, end) => {
-      const clamped = clampViewport(start, end);
+      const clamped = isControlled ? { start, end } : clampViewport(start, end);
       if (!isControlled) {
         setInnerStart(clamped.start);
         setInnerEnd(clamped.end);
