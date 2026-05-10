@@ -23,7 +23,7 @@ Peer deps: `react >= 18`, `react-dom >= 18`.
 
 ## Usage
 
-A complete example with typed items, range bars, per-item colors, a selection state, and a "now" cursor:
+The screenshot above is rendered by exactly this code:
 
 ```tsx
 import { useState } from "react";
@@ -61,25 +61,55 @@ const items: TimelineItem<EventMeta>[] = [
     data: { category: "release", description: "Invite-based external testing" },
   },
   {
+    id: "infra",
+    label: "Infrastructure migration",
+    start: Date.parse("2025-05-12"),
+    end: Date.parse("2025-05-19"),
+    data: { category: "ops", description: "Vercel → self-hosted" },
+  },
+  {
     id: "launch",
     label: "Official launch 🚀",
     start: Date.parse("2025-09-12"),
     color: "#ef4444",
     data: { category: "milestone", description: "Press announcement + blog post" },
   },
+  {
+    id: "postmortem",
+    label: "Launch retrospective",
+    start: Date.parse("2025-09-30"),
+    data: { category: "ops", description: "Team retro + next-quarter plan" },
+  },
+  {
+    id: "v2",
+    label: "v2 planning",
+    start: Date.parse("2025-10-10"),
+    end: Date.parse("2025-12-20"),
+    color: "#8b5cf6",
+    data: { category: "milestone", description: "Define next-version spec" },
+  },
 ];
 
 export function App() {
-  const [selected, setSelected] = useState<TimelineItem<EventMeta> | null>(null);
+  const [selected, setSelected] = useState<TimelineItem<EventMeta> | null>(
+    null,
+  );
 
   return (
     <div style={{ padding: 24, maxWidth: 1100, margin: "0 auto" }}>
+      <h1 style={{ marginBottom: 4 }}>react-stable-timeline demo</h1>
+      <p style={{ color: "#666", marginTop: 0 }}>
+        Pan: drag or two-finger horizontal scroll · Zoom: ⌘/Ctrl + wheel · Click
+        an item to select
+      </p>
+
       <div
         style={{
           height: 420,
           border: "1px solid #e5e7eb",
           borderRadius: 12,
           overflow: "hidden",
+          background: "#fff",
         }}
       >
         <Timeline<EventMeta>
@@ -87,42 +117,51 @@ export function App() {
           accentColor="#6c8cff"
           cursorMs={Date.now()}
           onSelect={setSelected}
+          labels={{
+            fit: "Fit all",
+            zoomIn: "Zoom in",
+            zoomOut: "Zoom out",
+            zoomRatio: "Zoom",
+            empty: "No events",
+          }}
         />
       </div>
 
-      {selected && (
-        <div style={{ marginTop: 16 }}>
-          <strong>{selected.label}</strong> — {selected.data?.description}
-        </div>
-      )}
+      <div
+        style={{
+          marginTop: 16,
+          padding: 16,
+          border: "1px solid #e5e7eb",
+          borderRadius: 12,
+          minHeight: 80,
+          background: "#f9fafb",
+        }}
+      >
+        {selected ? (
+          <>
+            <div style={{ fontWeight: 600, fontSize: 16 }}>
+              {selected.label}
+            </div>
+            <div style={{ color: "#555", marginTop: 4 }}>
+              {new Date(selected.start).toLocaleDateString("en-US")}
+              {selected.end != null &&
+                ` ~ ${new Date(selected.end).toLocaleDateString("en-US")}`}
+              {" · "}
+              <span style={{ color: "#888" }}>
+                {selected.data?.category}
+              </span>
+            </div>
+            <div style={{ marginTop: 8 }}>{selected.data?.description}</div>
+          </>
+        ) : (
+          <span style={{ color: "#888" }}>
+            Click an item to see its details here.
+          </span>
+        )}
+      </div>
     </div>
   );
 }
-```
-
-A runnable version of this example lives at [`react-stable-timeline-example`](../react-stable-timeline-example) (Vite + React 19 + TS, with localized toolbar labels and a detail panel).
-
-### Minimal setup
-
-If you just want to drop a timeline in:
-
-```tsx
-import { Timeline, type TimelineItem } from "@mogiyoon/react-stable-timeline";
-
-const items: TimelineItem[] = [
-  { id: "1", label: "Kickoff", start: Date.parse("2025-01-15") },
-  {
-    id: "2",
-    label: "Beta",
-    start: Date.parse("2025-04-01"),
-    end: Date.parse("2025-06-30"),
-  },
-  { id: "3", label: "Launch", start: Date.parse("2025-09-12") },
-];
-
-<div style={{ height: 400 }}>
-  <Timeline items={items} />
-</div>;
 ```
 
 ## Controlled viewport
