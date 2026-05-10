@@ -43,6 +43,7 @@ export function Timeline<TData = unknown>({
   hideToolbar = false,
   zoomMinPct = 100,
   zoomMaxPct = 5000,
+  zoomStable = false,
   className,
   style,
 }: TimelineProps<TData>) {
@@ -141,10 +142,13 @@ export function Timeline<TData = unknown>({
     [clampViewport, isControlled, onViewportChange],
   );
 
+  const fitPxPerMs =
+    fitWindow && fitWindow.span > 0 ? canvasPx / fitWindow.span : 0;
+  const packPxPerMs = zoomStable ? fitPxPerMs : pxPerMs;
   const rowOf = useMemo(() => {
-    if (pxPerMs <= 0) return new Map<string, number>();
-    return packIntoRows(packInput, pxPerMs, measureLabel);
-  }, [packInput, pxPerMs, measureLabel]);
+    if (packPxPerMs <= 0) return new Map<string, number>();
+    return packIntoRows(packInput, packPxPerMs, measureLabel);
+  }, [packInput, packPxPerMs, measureLabel]);
   const totalRows = useMemo(() => {
     let max = 0;
     for (const r of rowOf.values()) max = Math.max(max, r);

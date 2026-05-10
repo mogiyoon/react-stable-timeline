@@ -145,6 +145,7 @@ function Timeline({
   hideToolbar = false,
   zoomMinPct = 100,
   zoomMaxPct = 5e3,
+  zoomStable = false,
   className,
   style
 }) {
@@ -232,10 +233,12 @@ function Timeline({
     },
     [clampViewport, isControlled, onViewportChange]
   );
+  const fitPxPerMs = fitWindow && fitWindow.span > 0 ? canvasPx / fitWindow.span : 0;
+  const packPxPerMs = zoomStable ? fitPxPerMs : pxPerMs;
   const rowOf = react.useMemo(() => {
-    if (pxPerMs <= 0) return /* @__PURE__ */ new Map();
-    return packIntoRows(packInput, pxPerMs, measureLabel);
-  }, [packInput, pxPerMs, measureLabel]);
+    if (packPxPerMs <= 0) return /* @__PURE__ */ new Map();
+    return packIntoRows(packInput, packPxPerMs, measureLabel);
+  }, [packInput, packPxPerMs, measureLabel]);
   const totalRows = react.useMemo(() => {
     let max = 0;
     for (const r of rowOf.values()) max = Math.max(max, r);

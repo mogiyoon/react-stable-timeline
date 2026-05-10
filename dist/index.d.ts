@@ -49,11 +49,20 @@ interface TimelineProps<TData = unknown> {
      */
     zoomMinPct?: number;
     zoomMaxPct?: number;
+    /**
+     * When `true`, rows are computed once at fit-zoom and never change
+     * on zoom — items keep the same row at every zoom level. When
+     * `false` (default), rows are recomputed at the current zoom, so
+     * zooming in lets previously-stacked items collapse upward as
+     * their labels stop overlapping. Panning is always stable
+     * regardless of this flag.
+     */
+    zoomStable?: boolean;
     className?: string;
     style?: CSSProperties;
 }
 
-declare function Timeline<TData = unknown>({ items, viewportStart: viewportStartProp, viewportEnd: viewportEndProp, onViewportChange, cursorMs, onSelect, accentColor, labels: labelsProp, hideToolbar, zoomMinPct, zoomMaxPct, className, style, }: TimelineProps<TData>): react_jsx_runtime.JSX.Element;
+declare function Timeline<TData = unknown>({ items, viewportStart: viewportStartProp, viewportEnd: viewportEndProp, onViewportChange, cursorMs, onSelect, accentColor, labels: labelsProp, hideToolbar, zoomMinPct, zoomMaxPct, zoomStable, className, style, }: TimelineProps<TData>): react_jsx_runtime.JSX.Element;
 
 interface PackInput {
     id: string;

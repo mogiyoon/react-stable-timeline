@@ -4,6 +4,14 @@
   "description": "A React timeline with stable row packing — items never jump rows when you pan or zoom. Label-aware (Canvas2D) packing handles Hangul/Latin/mixed text correctly.",
   "license": "MIT",
   "author": "mogiyoon <mogiyoon@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mogiyoon/react-stable-timeline.git"
+  },
+  "homepage": "https://github.com/mogiyoon/react-stable-timeline#readme",
+  "bugs": {
+    "url": "https://github.com/mogiyoon/react-stable-timeline/issues"
+  },
   "keywords": [
     "react",
     "timeline",
