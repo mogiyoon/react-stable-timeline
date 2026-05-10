@@ -1,4 +1,5 @@
 # @mogiyoon/react-stable-timeline
+<img width="640" height="369" alt="화면 기록 2026-05-10 11 37 51_small" src="https://github.com/user-attachments/assets/1f01199a-fae6-4d7e-aa35-1540402d43c8" />
 
 A React timeline with **stable row packing** — events keep their row when you pan, instead of jumping around like other timeline libraries.
 
