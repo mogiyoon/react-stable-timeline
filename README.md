@@ -197,6 +197,7 @@ const [end, setEnd] = useState(...);
 | `labels` | `TimelineLabels` | English | Override toolbar labels (`fit`, `zoomIn`, `zoomOut`, `zoomRatio`, `empty`). |
 | `hideToolbar` | `boolean` | `false` | Hide the top toolbar. |
 | `zoomMinPct` / `zoomMaxPct` | `number` | `100` / `5000` | Zoom range relative to fit. Min cannot go below 100 — packing is computed at fit-zoom and would otherwise invalidate. |
+| `zoomFactor` | `number` | `1.2` | Multiplier applied per zoom step — toolbar `+` / `−` buttons and each `⌘`/`Ctrl` + wheel tick. `1.2` = 20 % per step; `1.5` = chunkier; `1.05` = smoother. Must be > 1. |
 | `zoomStable` | `boolean` | `false` | When `true`, freezes the row layout at fit-zoom so items never change rows at any zoom level. When `false`, rows recompute at the current zoom — items can collapse upward as zooming spreads them out. Panning is always stable regardless. |
 | `className` / `style` | — | — | Forwarded to the outer wrapper. |
 
