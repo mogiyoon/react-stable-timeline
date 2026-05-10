@@ -1,6 +1,6 @@
 {
   "name": "@mogiyoon/react-stable-timeline",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A React timeline with stable row packing — items never jump rows when you pan or zoom. Label-aware (Canvas2D) packing handles Hangul/Latin/mixed text correctly.",
   "license": "MIT",
   "author": "mogiyoon <mogiyoon@gmail.com>",
