@@ -22,7 +22,7 @@ npm i @mogiyoon/react-stable-timeline
 Peer deps: `react >= 18`, `react-dom >= 18`.
 
 ## Usage
-
+<img width="1117" height="631" alt="image" src="https://github.com/user-attachments/assets/0820d6a6-1a04-4f6f-85de-cd2bdba5798c" />
 The screenshot above is rendered by exactly this code:
 
 ```tsx
