@@ -1,9 +1,9 @@
 # @mogiyoon/react-stable-timeline
 <img width="640" height="369" alt="화면 기록 2026-05-10 11 37 51_small" src="https://github.com/user-attachments/assets/1f01199a-fae6-4d7e-aa35-1540402d43c8" />
 
-A React timeline with **stable row packing** — events keep their row when you pan, instead of jumping around like other timeline libraries.
+A React timeline with **stable row packing** — events keep their row when you pan, instead of jumping around as the viewport changes.
 
-Most timeline libraries (`vis-timeline`, `react-calendar-timeline`, …) recompute their stack from whatever is currently visible, so the same event lands on row 3 at one pan position and row 1 at another. This library packs rows from the **full dataset**, so panning never reshuffles rows. Zooming optionally too — see `zoomStable`.
+Viewport-based stacking algorithms recompute the row layout from whatever is currently visible, so the same event lands on row 3 at one pan position and row 1 at another. This library packs rows from the **full dataset**, so panning never reshuffles rows. Zooming optionally too — see `zoomStable`.
 
 - **Pan-stable rows** — first-fit packing on the full data, not the viewport
 - **Label-aware** — uses `Canvas2D.measureText`, so Hangul / CJK / mixed text measures correctly (per-character estimates under-count Hangul by ~30 %)
@@ -225,7 +225,7 @@ interface TimelineItem<TData = unknown> {
 
 ## Why "stable"?
 
-The same event being on row 3 at one pan position and row 5 at another is what most stack algorithms do — they recompute against viewport-relative pixel positions, so the visible items determine where everything lands.
+The same event landing on row 3 at one pan position and row 5 at another is what viewport-based stack algorithms produce — they recompute against viewport-relative pixel positions, so the visible items determine where everything lands.
 
 This library runs first-fit packing over **all items** at once, so panning never changes anyone's row. Zoom is a separate axis: by default rows do recompute on zoom (items spread apart, so previously-stacked items can collapse upward) which is usually what you want. Pass `zoomStable` to lock rows at fit-zoom and keep them put across every zoom level too.
 
