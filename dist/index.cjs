@@ -495,7 +495,7 @@ function Timeline({
           cursor: "grab"
         },
         children: [
-          /* @__PURE__ */ jsxRuntime.jsxs(
+          /* @__PURE__ */ jsxRuntime.jsx(
             "div",
             {
               style: {
@@ -507,154 +507,163 @@ function Timeline({
                 overflowY: "auto",
                 overflowX: "hidden"
               },
-              children: [
-                ticks.map((tick) => {
-                  const x = timeToPx(tick.ms);
-                  if (x < -1 || x > canvasPx + 1) return null;
-                  return /* @__PURE__ */ jsxRuntime.jsx(
-                    "div",
-                    {
-                      style: {
-                        pointerEvents: "none",
-                        position: "absolute",
-                        top: 0,
-                        bottom: 0,
-                        width: 1,
-                        left: x,
-                        background: "rgba(127,127,127,0.15)"
-                      }
-                    },
-                    `grid-${tick.ms}`
-                  );
-                }),
-                cursorMs !== null && cursorMs !== void 0 && (() => {
-                  const x = timeToPx(cursorMs);
-                  if (x < 0 || x > canvasPx) return null;
-                  return /* @__PURE__ */ jsxRuntime.jsx(
-                    "div",
-                    {
-                      style: {
-                        pointerEvents: "none",
-                        position: "absolute",
-                        top: 0,
-                        bottom: 0,
-                        width: 1,
-                        left: x,
-                        background: accentColor,
-                        opacity: 0.85
-                      }
-                    }
-                  );
-                })(),
-                /* @__PURE__ */ jsxRuntime.jsx(
-                  "div",
-                  {
-                    style: {
-                      position: "relative",
-                      height: rowsHeight,
-                      paddingTop: 8
-                    },
-                    children: items.map((item) => {
-                      const row = rowOf.get(item.id) ?? 0;
-                      const start = item.start;
-                      const end = item.end ?? item.start;
-                      const isRange = item.end !== void 0 && item.end !== item.start;
-                      const startX = timeToPx(start);
-                      const endX = isRange ? timeToPx(end) : startX;
-                      const top = row * (ROW_HEIGHT + ROW_GAP);
-                      const rangeWidth = isRange ? Math.max(2, endX - startX) : 0;
-                      const itemColor = item.color ?? accentColor;
-                      return /* @__PURE__ */ jsxRuntime.jsxs(
+              children: /* @__PURE__ */ jsxRuntime.jsxs(
+                "div",
+                {
+                  style: {
+                    position: "relative",
+                    minHeight: "100%"
+                  },
+                  children: [
+                    ticks.map((tick) => {
+                      const x = timeToPx(tick.ms);
+                      if (x < -1 || x > canvasPx + 1) return null;
+                      return /* @__PURE__ */ jsxRuntime.jsx(
                         "div",
                         {
-                          role: "button",
-                          tabIndex: 0,
-                          onClick: (e) => {
-                            e.stopPropagation();
-                            handleItemClick(item.id);
-                          },
-                          onKeyDown: (e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                              e.preventDefault();
-                              handleItemClick(item.id);
-                            }
-                          },
                           style: {
+                            pointerEvents: "none",
                             position: "absolute",
-                            cursor: "pointer",
-                            outline: "none",
-                            left: startX,
-                            top,
-                            height: ROW_HEIGHT,
-                            width: Math.max(DOT_HEIGHT, rangeWidth + DOT_HEIGHT)
-                          },
-                          title: item.label,
-                          children: [
-                            /* @__PURE__ */ jsxRuntime.jsx(
-                              "span",
-                              {
-                                style: {
-                                  position: "absolute",
-                                  whiteSpace: "nowrap",
-                                  fontSize: 11,
-                                  top: 0,
-                                  left: 0,
-                                  height: LABEL_HEIGHT,
-                                  lineHeight: `${LABEL_HEIGHT}px`,
-                                  paddingLeft: 2
-                                },
-                                children: item.label
-                              }
-                            ),
-                            isRange && /* @__PURE__ */ jsxRuntime.jsx(
-                              "div",
-                              {
-                                style: {
-                                  position: "absolute",
-                                  height: 2,
-                                  left: 0,
-                                  top: LABEL_HEIGHT + DOT_HEIGHT / 2 - 1,
-                                  width: rangeWidth,
-                                  background: itemColor
-                                }
-                              }
-                            ),
-                            /* @__PURE__ */ jsxRuntime.jsx(
-                              "span",
-                              {
-                                style: {
-                                  position: "absolute",
-                                  borderRadius: "50%",
-                                  left: 0,
-                                  top: LABEL_HEIGHT + (DOT_HEIGHT - 8) / 2,
-                                  width: 8,
-                                  height: 8,
-                                  background: itemColor
-                                }
-                              }
-                            ),
-                            isRange && /* @__PURE__ */ jsxRuntime.jsx(
-                              "span",
-                              {
-                                style: {
-                                  position: "absolute",
-                                  borderRadius: "50%",
-                                  left: rangeWidth - 8,
-                                  top: LABEL_HEIGHT + (DOT_HEIGHT - 8) / 2,
-                                  width: 8,
-                                  height: 8,
-                                  background: itemColor
-                                }
-                              }
-                            )
-                          ]
+                            top: 0,
+                            bottom: 0,
+                            width: 1,
+                            left: x,
+                            background: "rgba(127,127,127,0.15)"
+                          }
                         },
-                        item.id
+                        `grid-${tick.ms}`
                       );
-                    })
-                  }
-                )
-              ]
+                    }),
+                    cursorMs !== null && cursorMs !== void 0 && (() => {
+                      const x = timeToPx(cursorMs);
+                      if (x < 0 || x > canvasPx) return null;
+                      return /* @__PURE__ */ jsxRuntime.jsx(
+                        "div",
+                        {
+                          style: {
+                            pointerEvents: "none",
+                            position: "absolute",
+                            top: 0,
+                            bottom: 0,
+                            width: 1,
+                            left: x,
+                            background: accentColor,
+                            opacity: 0.85
+                          }
+                        }
+                      );
+                    })(),
+                    /* @__PURE__ */ jsxRuntime.jsx(
+                      "div",
+                      {
+                        style: {
+                          position: "relative",
+                          height: rowsHeight,
+                          paddingTop: 8
+                        },
+                        children: items.map((item) => {
+                          const row = rowOf.get(item.id) ?? 0;
+                          const start = item.start;
+                          const end = item.end ?? item.start;
+                          const isRange = item.end !== void 0 && item.end !== item.start;
+                          const startX = timeToPx(start);
+                          const endX = isRange ? timeToPx(end) : startX;
+                          const top = row * (ROW_HEIGHT + ROW_GAP);
+                          const rangeWidth = isRange ? Math.max(2, endX - startX) : 0;
+                          const itemColor = item.color ?? accentColor;
+                          return /* @__PURE__ */ jsxRuntime.jsxs(
+                            "div",
+                            {
+                              role: "button",
+                              tabIndex: 0,
+                              onClick: (e) => {
+                                e.stopPropagation();
+                                handleItemClick(item.id);
+                              },
+                              onKeyDown: (e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  handleItemClick(item.id);
+                                }
+                              },
+                              style: {
+                                position: "absolute",
+                                cursor: "pointer",
+                                outline: "none",
+                                left: startX,
+                                top,
+                                height: ROW_HEIGHT,
+                                width: Math.max(DOT_HEIGHT, rangeWidth + DOT_HEIGHT)
+                              },
+                              title: item.label,
+                              children: [
+                                /* @__PURE__ */ jsxRuntime.jsx(
+                                  "span",
+                                  {
+                                    style: {
+                                      position: "absolute",
+                                      whiteSpace: "nowrap",
+                                      fontSize: 11,
+                                      top: 0,
+                                      left: 0,
+                                      height: LABEL_HEIGHT,
+                                      lineHeight: `${LABEL_HEIGHT}px`,
+                                      paddingLeft: 2
+                                    },
+                                    children: item.label
+                                  }
+                                ),
+                                isRange && /* @__PURE__ */ jsxRuntime.jsx(
+                                  "div",
+                                  {
+                                    style: {
+                                      position: "absolute",
+                                      height: 2,
+                                      left: 0,
+                                      top: LABEL_HEIGHT + DOT_HEIGHT / 2 - 1,
+                                      width: rangeWidth,
+                                      background: itemColor
+                                    }
+                                  }
+                                ),
+                                /* @__PURE__ */ jsxRuntime.jsx(
+                                  "span",
+                                  {
+                                    style: {
+                                      position: "absolute",
+                                      borderRadius: "50%",
+                                      left: 0,
+                                      top: LABEL_HEIGHT + (DOT_HEIGHT - 8) / 2,
+                                      width: 8,
+                                      height: 8,
+                                      background: itemColor
+                                    }
+                                  }
+                                ),
+                                isRange && /* @__PURE__ */ jsxRuntime.jsx(
+                                  "span",
+                                  {
+                                    style: {
+                                      position: "absolute",
+                                      borderRadius: "50%",
+                                      left: rangeWidth - 8,
+                                      top: LABEL_HEIGHT + (DOT_HEIGHT - 8) / 2,
+                                      width: 8,
+                                      height: 8,
+                                      background: itemColor
+                                    }
+                                  }
+                                )
+                              ]
+                            },
+                            item.id
+                          );
+                        })
+                      }
+                    )
+                  ]
+                }
+              )
             }
           ),
           /* @__PURE__ */ jsxRuntime.jsx(

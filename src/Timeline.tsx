@@ -427,30 +427,18 @@ export function Timeline<TData = unknown>({
             overflowX: "hidden",
           }}
         >
-          {ticks.map((tick) => {
-            const x = timeToPx(tick.ms);
-            if (x < -1 || x > canvasPx + 1) return null;
-            return (
-              <div
-                key={`grid-${tick.ms}`}
-                style={{
-                  pointerEvents: "none",
-                  position: "absolute",
-                  top: 0,
-                  bottom: 0,
-                  width: 1,
-                  left: x,
-                  background: "rgba(127,127,127,0.15)",
-                }}
-              />
-            );
-          })}
-          {cursorMs !== null && cursorMs !== undefined &&
-            (() => {
-              const x = timeToPx(cursorMs);
-              if (x < 0 || x > canvasPx) return null;
+          <div
+            style={{
+              position: "relative",
+              minHeight: "100%",
+            }}
+          >
+            {ticks.map((tick) => {
+              const x = timeToPx(tick.ms);
+              if (x < -1 || x > canvasPx + 1) return null;
               return (
                 <div
+                  key={`grid-${tick.ms}`}
                   style={{
                     pointerEvents: "none",
                     position: "absolute",
@@ -458,20 +446,38 @@ export function Timeline<TData = unknown>({
                     bottom: 0,
                     width: 1,
                     left: x,
-                    background: accentColor,
-                    opacity: 0.85,
+                    background: "rgba(127,127,127,0.15)",
                   }}
                 />
               );
-            })()}
+            })}
+            {cursorMs !== null && cursorMs !== undefined &&
+              (() => {
+                const x = timeToPx(cursorMs);
+                if (x < 0 || x > canvasPx) return null;
+                return (
+                  <div
+                    style={{
+                      pointerEvents: "none",
+                      position: "absolute",
+                      top: 0,
+                      bottom: 0,
+                      width: 1,
+                      left: x,
+                      background: accentColor,
+                      opacity: 0.85,
+                    }}
+                  />
+                );
+              })()}
 
-          <div
-            style={{
-              position: "relative",
-              height: rowsHeight,
-              paddingTop: 8,
-            }}
-          >
+            <div
+              style={{
+                position: "relative",
+                height: rowsHeight,
+                paddingTop: 8,
+              }}
+            >
             {items.map((item) => {
               const row = rowOf.get(item.id) ?? 0;
               const start = item.start;
@@ -561,6 +567,7 @@ export function Timeline<TData = unknown>({
                 </div>
               );
             })}
+            </div>
           </div>
         </div>
 
