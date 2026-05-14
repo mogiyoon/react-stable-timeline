@@ -268,6 +268,8 @@ function Toolbar({
   setZoomPct,
   zoomMinPct,
   zoomMaxPct,
+  typingCommit,
+  spinnerCommit,
   onFit,
   onZoomIn,
   onZoomOut
@@ -305,12 +307,19 @@ function Toolbar({
           max: zoomMaxPct,
           step: 5,
           onChange: (e) => {
-            const inputType = e.nativeEvent.inputType;
-            if (inputType) {
-              setZoomPctDraft(e.target.value);
+            const raw = e.target.value;
+            const v = Number(raw);
+            const isTyping = !!e.nativeEvent.inputType;
+            const mode = isTyping ? typingCommit : spinnerCommit;
+            if (mode === "blur") {
+              setZoomPctDraft(raw);
               return;
             }
-            const v = Number(e.target.value);
+            if (isTyping) {
+              setZoomPctDraft(raw);
+              if (Number.isFinite(v)) setZoomPct(v);
+              return;
+            }
             setZoomPctDraft(null);
             if (Number.isFinite(v)) setZoomPct(v);
           },
@@ -681,6 +690,8 @@ function Timeline({
   zoomMaxPct = 5e3,
   zoomFactor = DEFAULT_ZOOM_FACTOR,
   zoomStable = false,
+  zoomInputTypingCommit = "immediate",
+  zoomInputSpinnerCommit = "immediate",
   className,
   style
 }) {
@@ -813,6 +824,8 @@ function Timeline({
         setZoomPct,
         zoomMinPct,
         zoomMaxPct,
+        typingCommit: zoomInputTypingCommit,
+        spinnerCommit: zoomInputSpinnerCommit,
         onFit: handleFit,
         onZoomIn: handleZoomIn,
         onZoomOut: handleZoomOut
