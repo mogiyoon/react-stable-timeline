@@ -64,11 +64,29 @@ interface TimelineProps<TData = unknown> {
      * regardless of this flag.
      */
     zoomStable?: boolean;
+    /**
+     * When the user *types* into the zoom percent input, should the new
+     * value apply on every keystroke (`"immediate"`, default) or only
+     * after the input loses focus / Enter is pressed (`"blur"`)?
+     *
+     * Mid-stroke values outside `[zoomMinPct, zoomMaxPct]` are clamped
+     * by `setZoomPct`, so typing `"15"` toward `"150"` with the default
+     * `zoomMinPct: 100` will visibly snap the canvas to 100 % until the
+     * third digit is typed.
+     */
+    zoomInputTypingCommit?: "immediate" | "blur";
+    /**
+     * When the user clicks the native ▲/▼ spinner inside the zoom
+     * percent input, should the new value apply right away
+     * (`"immediate"`, default) or only after the input loses focus
+     * (`"blur"`)?
+     */
+    zoomInputSpinnerCommit?: "immediate" | "blur";
     className?: string;
     style?: CSSProperties;
 }
 
-declare function Timeline<TData = unknown>({ items, viewportStart: viewportStartProp, viewportEnd: viewportEndProp, onViewportChange, cursorMs, onSelect, accentColor, labels: labelsProp, hideToolbar, zoomMinPct, zoomMaxPct, zoomFactor, zoomStable, className, style, }: TimelineProps<TData>): react_jsx_runtime.JSX.Element;
+declare function Timeline<TData = unknown>({ items, viewportStart: viewportStartProp, viewportEnd: viewportEndProp, onViewportChange, cursorMs, onSelect, accentColor, labels: labelsProp, hideToolbar, zoomMinPct, zoomMaxPct, zoomFactor, zoomStable, zoomInputTypingCommit, zoomInputSpinnerCommit, className, style, }: TimelineProps<TData>): react_jsx_runtime.JSX.Element;
 
 interface PackInput {
     id: string;
