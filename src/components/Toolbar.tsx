@@ -58,6 +58,8 @@ interface ToolbarProps {
   setZoomPct: (pct: number) => void;
   zoomMinPct: number;
   zoomMaxPct: number;
+  typingCommit: "immediate" | "blur";
+  spinnerCommit: "immediate" | "blur";
   onFit: () => void;
   onZoomIn: () => void;
   onZoomOut: () => void;
@@ -71,6 +73,8 @@ export function Toolbar({
   setZoomPct,
   zoomMinPct,
   zoomMaxPct,
+  typingCommit,
+  spinnerCommit,
   onFit,
   onZoomIn,
   onZoomOut,
@@ -105,12 +109,19 @@ export function Toolbar({
           max={zoomMaxPct}
           step={5}
           onChange={(e) => {
-            const inputType = (e.nativeEvent as InputEvent).inputType;
-            if (inputType) {
-              setZoomPctDraft(e.target.value);
+            const raw = e.target.value;
+            const v = Number(raw);
+            const isTyping = !!(e.nativeEvent as InputEvent).inputType;
+            const mode = isTyping ? typingCommit : spinnerCommit;
+            if (mode === "blur") {
+              setZoomPctDraft(raw);
               return;
             }
-            const v = Number(e.target.value);
+            if (isTyping) {
+              setZoomPctDraft(raw);
+              if (Number.isFinite(v)) setZoomPct(v);
+              return;
+            }
             setZoomPctDraft(null);
             if (Number.isFinite(v)) setZoomPct(v);
           }}

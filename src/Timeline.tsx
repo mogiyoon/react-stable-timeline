@@ -46,6 +46,8 @@ export function Timeline<TData = unknown>({
   zoomMaxPct = 5000,
   zoomFactor = DEFAULT_ZOOM_FACTOR,
   zoomStable = false,
+  zoomInputTypingCommit = "immediate",
+  zoomInputSpinnerCommit = "immediate",
   className,
   style,
 }: TimelineProps<TData>) {
@@ -195,6 +197,8 @@ export function Timeline<TData = unknown>({
           setZoomPct={setZoomPct}
           zoomMinPct={zoomMinPct}
           zoomMaxPct={zoomMaxPct}
+          typingCommit={zoomInputTypingCommit}
+          spinnerCommit={zoomInputSpinnerCommit}
           onFit={handleFit}
           onZoomIn={handleZoomIn}
           onZoomOut={handleZoomOut}
