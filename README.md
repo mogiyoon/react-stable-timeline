@@ -200,6 +200,8 @@ const [end, setEnd] = useState(...);
 | `zoomMinPct` / `zoomMaxPct` | `number` | `100` / `5000` | Zoom range relative to fit. Min cannot go below 100 — packing is computed at fit-zoom and would otherwise invalidate. |
 | `zoomFactor` | `number` | `1.2` | Multiplier applied per zoom step — toolbar `+` / `−` buttons and each `⌘`/`Ctrl` + wheel tick. `1.2` = 20 % per step; `1.5` = chunkier; `1.05` = smoother. Must be > 1. |
 | `zoomStable` | `boolean` | `false` | When `true`, freezes the row layout at fit-zoom so items never change rows at any zoom level. When `false`, rows recompute at the current zoom — items can collapse upward as zooming spreads them out. Panning is always stable regardless. |
+| `zoomInputTypingCommit` | `"immediate" \| "blur"` | `"immediate"` | When the user **types** in the zoom % input, does each keystroke apply (`"immediate"`) or only the final value on blur / Enter (`"blur"`)? Mid-stroke values get clamped to `[zoomMinPct, zoomMaxPct]`, so typing `"15"` toward `"150"` with the default `zoomMinPct: 100` will visibly snap to 100 % until the third digit is typed. |
+| `zoomInputSpinnerCommit` | `"immediate" \| "blur"` | `"immediate"` | When the user clicks the native ▲/▼ **spinner** inside the zoom % input, does it apply right away (`"immediate"`) or only on blur (`"blur"`)? |
 | `className` / `style` | — | — | Forwarded to the outer wrapper. |
 
 ## TimelineItem
