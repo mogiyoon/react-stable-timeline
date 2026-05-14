@@ -305,7 +305,14 @@ function Toolbar({
           max: zoomMaxPct,
           step: 5,
           onChange: (e) => {
-            setZoomPctDraft(e.target.value);
+            const inputType = e.nativeEvent.inputType;
+            if (inputType) {
+              setZoomPctDraft(e.target.value);
+              return;
+            }
+            const v = Number(e.target.value);
+            setZoomPctDraft(null);
+            if (Number.isFinite(v)) setZoomPct(v);
           },
           onBlur: (e) => {
             const v = Number(e.target.value);
