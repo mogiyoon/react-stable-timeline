@@ -42,7 +42,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "demo": "esbuild demo/main.tsx --bundle --outfile=demo/bundle.js --servedir=demo --serve=127.0.0.1:5173 --jsx=automatic",
+    "demo": "esbuild demo/main.tsx --bundle --outfile=demo/bundle.js --servedir=demo --serve=0.0.0.0:5173 --jsx=automatic",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "prepublishOnly": "npm run build"
