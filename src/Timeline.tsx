@@ -173,7 +173,11 @@ export function Timeline<TData = unknown>({
               style={{
                 position: "relative",
                 height: tl.rowsHeight,
-                paddingTop: 8,
+                // NOT padding: absolutely-positioned items anchor to the
+                // padding box, so padding wouldn't push them down — a
+                // transparent border does, giving the top row's focus
+                // outline room instead of clipping at the scroll edge.
+                borderTop: "8px solid transparent",
               }}
             >
               {tl.visibleItems.map((positioned) => {
