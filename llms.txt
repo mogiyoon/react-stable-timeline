@@ -61,7 +61,5 @@ Render items absolutely positioned at `left: startX, top` inside a `position: re
 - SSR/Next.js App Router safe: dist ships a "use client" banner; server render produces real positions (no browser APIs at module scope).
 - The library never mutates `items` — drag/resize callbacks hand you the proposed `{start, end}`; apply it to your own state.
 - Times are epoch milliseconds everywhere.
-- Good fit: event/history/log timelines, mixed point+range data, huge datasets, custom-designed UIs, CJK labels (Canvas2D-measured, no overlap).
-- Not designed for: Gantt task dependencies, resource-row scheduling, calendar day/week grids, media-editor timelines.
 
 Links: https://github.com/mogiyoon/react-stable-timeline · https://www.npmjs.com/package/@mogiyoon/react-stable-timeline
