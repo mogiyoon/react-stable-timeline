@@ -9,6 +9,45 @@ interface PackInput {
   isRange: boolean;
 }
 
+/** Min-segment tree over row end positions answering the first-fit
+ *  query — "leftmost row whose end ≤ x" — in O(log R). Unused capacity
+ *  holds +Infinity, which can never satisfy `≤ x`, so it never wins. */
+class LeftmostFitTree {
+  private readonly cap: number;
+  private readonly tree: Float64Array;
+
+  constructor(maxRows: number) {
+    let cap = 1;
+    while (cap < maxRows) cap *= 2;
+    this.cap = cap;
+    this.tree = new Float64Array(cap * 2).fill(Infinity);
+  }
+
+  /** Leftmost index whose value is ≤ x, or -1 if none. Descends the
+   *  tree preferring the left child whenever it contains a fit, which
+   *  is exactly the linear scan's "first index" semantics. */
+  queryLeftmost(x: number): number {
+    if (this.tree[1]! > x) return -1;
+    let node = 1;
+    while (node < this.cap) {
+      node *= 2;
+      if (this.tree[node]! > x) node += 1;
+    }
+    return node - this.cap;
+  }
+
+  set(index: number, value: number): void {
+    let node = this.cap + index;
+    this.tree[node] = value;
+    for (node >>= 1; node >= 1; node >>= 1) {
+      this.tree[node] = Math.min(
+        this.tree[node * 2]!,
+        this.tree[node * 2 + 1]!,
+      );
+    }
+  }
+}
+
 /** First-Fit interval partitioning, label-aware.
  *
  *  Each item's footprint = max of:
@@ -18,7 +57,12 @@ interface PackInput {
  *
  *  Output is stable: every item lands in the same row regardless of
  *  the current viewport — the same `(items, pxPerMs)` always returns
- *  the same Map. */
+ *  the same Map.
+ *
+ *  O(n log n): sort + one LeftmostFitTree query/update per item. The
+ *  layout is identical to a naive linear scan of the rows (verified by
+ *  a differential test), without its O(n²) worst case when every item
+ *  overlaps. */
 export function packIntoRows(
   items: PackInput[],
   pxPerMs: number,
@@ -34,25 +78,16 @@ export function packIntoRows(
   const minTime = sorted[0]!.start;
   const FIXED_PX = LABEL_FIXED_PX;
 
-  const rowEndsPx: number[] = [];
+  const rowEnds = new LeftmostFitTree(sorted.length);
+  let rowCount = 0;
   for (const item of sorted) {
     const startPx = (item.start - minTime) * pxPerMs;
     const rangeEndPx = item.isRange ? (item.end - minTime) * pxPerMs : startPx;
     const labelEndPx = startPx + measureLabel(item.label) + FIXED_PX;
     const endPx = Math.max(rangeEndPx, labelEndPx);
-    let row = -1;
-    for (let i = 0; i < rowEndsPx.length; i++) {
-      if (rowEndsPx[i]! <= startPx) {
-        row = i;
-        break;
-      }
-    }
-    if (row === -1) {
-      row = rowEndsPx.length;
-      rowEndsPx.push(endPx);
-    } else {
-      rowEndsPx[row] = endPx;
-    }
+    let row = rowEnds.queryLeftmost(startPx);
+    if (row === -1) row = rowCount++;
+    rowEnds.set(row, endPx);
     rowOf.set(item.id, row);
   }
   return rowOf;
