@@ -44,6 +44,8 @@ export interface PositionedItem<TData = unknown> {
   /** Pixel x of `end` (same as `startX` for point events). */
   endX: number;
   isRange: boolean;
+  /** Measured pixel width of the label text (Canvas2D; SSR fallback estimate). */
+  labelWidth: number;
   /** True while this item is being dragged (positions include the preview offset). */
   isDragging: boolean;
 }
