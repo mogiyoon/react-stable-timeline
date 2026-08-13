@@ -4,10 +4,11 @@ export interface TickSpec {
 }
 
 /** Pick a tick interval whose pixel spacing lands close to ~100 px.
- *  Walks year/month/week/day/hour steps in turn and picks the first
- *  whose `step` would render at least that wide. The target is
- *  generous so labels never crowd each other even with longer Korean
- *  year-month text. */
+ *  Walks year/month/week/day steps from coarse to fine and picks the
+ *  largest step that still renders within the ~100 px target (so
+ *  ticks are at most ~100 px apart), with 1 hour as the floor. The
+ *  target is generous so labels never crowd each other even with
+ *  longer Korean year-month text. */
 export function pickTicks(
   viewportStart: number,
   viewportEnd: number,

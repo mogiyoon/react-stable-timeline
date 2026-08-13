@@ -1,4 +1,8 @@
-import type { CSSProperties } from "react";
+import type {
+  CSSProperties,
+  PointerEvent as ReactPointerEvent,
+  ReactNode,
+} from "react";
 
 export interface TimelineItem<TData = unknown> {
   id: string;
@@ -13,6 +17,54 @@ export interface TimelineItem<TData = unknown> {
   data?: TData;
 }
 
+export interface TimeRange {
+  start: number;
+  end: number;
+}
+
+export type ResizeEdge = "start" | "end";
+
+/** Pointer-down props to spread on a drag/resize handle element.
+ *  Pointer events cover mouse, touch, and pen; pair with
+ *  `touch-action: none` on the handle so the browser doesn't turn the
+ *  gesture into a scroll. */
+export interface DragHandleProps {
+  onPointerDown: (e: ReactPointerEvent) => void;
+}
+
+/** An item with its computed layout for the current viewport. */
+export interface PositionedItem<TData = unknown> {
+  item: TimelineItem<TData>;
+  /** Packed row index (0-based). */
+  row: number;
+  /** `row * (rowHeight + rowGap)` — vertical offset in px. */
+  top: number;
+  /** Pixel x of `start` relative to the canvas left edge. */
+  startX: number;
+  /** Pixel x of `end` (same as `startX` for point events). */
+  endX: number;
+  isRange: boolean;
+  /** True while this item is being dragged (positions include the preview offset). */
+  isDragging: boolean;
+}
+
+/** Everything `renderItem` needs to draw one item. */
+export interface TimelineItemRenderContext<TData = unknown>
+  extends PositionedItem<TData> {
+  /** Call to fire `onSelect` for this item. */
+  select: () => void;
+  /** Spread on the item root to make it movable. `undefined` unless `onItemMove` is set. */
+  moveHandleProps: DragHandleProps | undefined;
+  /** Spread on a left-edge handle. `undefined` unless `onItemResize` is set. */
+  resizeStartHandleProps: DragHandleProps | undefined;
+  /** Spread on a right-edge handle. `undefined` unless `onItemResize` is set. */
+  resizeEndHandleProps: DragHandleProps | undefined;
+  /** Shift this item by `deltaMs` (keyboard support). No-op unless `onItemMove` is set. */
+  moveBy: (deltaMs: number) => void;
+  /** Shift one edge by `deltaMs` (keyboard support). No-op unless `onItemResize` is set. */
+  resizeBy: (edge: ResizeEdge, deltaMs: number) => void;
+}
+
 export interface TimelineLabels {
   fit?: string;
   zoomIn?: string;
@@ -20,6 +72,9 @@ export interface TimelineLabels {
   zoomRatio?: string;
   /** Shown when `items` is empty. */
   empty?: string;
+  /** Screen-reader name for the items area (`aria-label`), announced
+   *  with the total item count. */
+  timeline?: string;
 }
 
 export interface TimelineProps<TData = unknown> {
@@ -94,6 +149,40 @@ export interface TimelineProps<TData = unknown> {
    * (`"blur"`)?
    */
   zoomInputSpinnerCommit?: "immediate" | "blur";
+
+  /**
+   * Enables moving items along the time axis by dragging. Called on
+   * drop with the item and its proposed new `{ start, end }` — apply
+   * it to your data (controlled: the timeline never mutates `items`).
+   */
+  onItemMove?: (item: TimelineItem<TData>, next: TimeRange) => void;
+
+  /**
+   * Enables resize handles on both edges of range items. Called on
+   * drop with the proposed new `{ start, end }` (span is clamped to
+   * ≥ 1 ms).
+   */
+  onItemResize?: (item: TimelineItem<TData>, next: TimeRange) => void;
+
+  /** Snap dragged/resized edges to this grid, in ms (e.g. 3600_000 = 1 h). */
+  dragSnapMs?: number;
+
+  /**
+   * Only render items whose pixel extent intersects the viewport
+   * (plus `overscanPx`). Default `true` — set `false` to always
+   * render every item.
+   */
+  virtualization?: boolean;
+
+  /** Extra px margin around the viewport kept rendered. Default 200. */
+  overscanPx?: number;
+
+  /**
+   * Replace the built-in item renderer. Receives layout + interaction
+   * props; return your own element (position it absolutely with
+   * `startX` / `top`).
+   */
+  renderItem?: (ctx: TimelineItemRenderContext<TData>) => ReactNode;
 
   className?: string;
   style?: CSSProperties;

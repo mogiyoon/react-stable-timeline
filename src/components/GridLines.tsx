@@ -15,6 +15,7 @@ export function GridLines({ ticks, canvasPx, timeToPx }: GridLinesProps) {
         return (
           <div
             key={`grid-${tick.ms}`}
+            aria-hidden="true"
             style={{
               pointerEvents: "none",
               position: "absolute",

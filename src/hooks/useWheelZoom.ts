@@ -2,6 +2,8 @@ import { useEffect, useRef, type RefObject } from "react";
 
 interface UseWheelZoomArgs {
   containerRef: RefObject<HTMLElement | null>;
+  /** See useContainerWidth: re-attach when the container first mounts. */
+  attached?: boolean;
   viewportStart: number;
   viewportEnd: number;
   canvasPx: number;
@@ -11,6 +13,7 @@ interface UseWheelZoomArgs {
 
 export function useWheelZoom({
   containerRef,
+  attached = true,
   viewportStart,
   viewportEnd,
   canvasPx,
@@ -42,10 +45,11 @@ export function useWheelZoom({
   };
 
   useEffect(() => {
+    if (!attached) return;
     const node = containerRef.current;
     if (!node) return;
     const onWheel = (e: WheelEvent) => handlerRef.current(e);
     node.addEventListener("wheel", onWheel, { passive: false });
     return () => node.removeEventListener("wheel", onWheel);
-  }, [containerRef]);
+  }, [containerRef, attached]);
 }

@@ -10,6 +10,7 @@ interface AxisProps {
 export function Axis({ ticks, canvasPx, timeToPx }: AxisProps) {
   return (
     <div
+      aria-hidden="true"
       style={{
         position: "absolute",
         bottom: 0,
