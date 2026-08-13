@@ -19,7 +19,13 @@ Viewport-based stacking algorithms recompute the row layout from whatever is cur
 - **SSR-safe** — ships with a `"use client"` banner for Next.js App Router; server rendering falls back gracefully where Canvas2D isn't available
 - **Zero CSS framework** — inline styles only, no Tailwind / styled-components / etc. required
 - **Controlled or uncontrolled** — pass `viewportStart` / `viewportEnd` to drive externally, or let it manage itself
-- **Tiny** — ~8 KB gzipped, tree-shakable, no dependencies beyond React
+- **Tiny** — ~9 KB gzipped, tree-shakable, no dependencies beyond React
+
+## Is this the right tool?
+
+**Good fit** — event/history/log timelines: releases, incidents, biographies, project milestones, chronologies. Mixed point + range events, from a handful to tens of thousands. Custom-designed UIs (headless), Next.js/SSR apps, CJK-heavy labels.
+
+**Not designed for** — Gantt charts (task dependencies, resource rows), calendar scheduling (day/week grids, recurring events), or media-editing timelines (tracks, clips, scrubbing). Those need different data models — reaching for this library there will fight you.
 
 ## Install
 
