@@ -18,3 +18,6 @@ npm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# build output — npm gets dist from prepublishOnly build, not from git
+dist/
