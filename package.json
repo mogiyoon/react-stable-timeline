@@ -15,10 +15,18 @@
   "keywords": [
     "react",
     "timeline",
-    "vis-timeline",
+    "react-timeline",
+    "headless",
+    "virtualization",
+    "virtualized",
+    "drag-and-drop",
+    "visualization",
+    "react-component",
+    "typescript",
+    "ssr",
     "events",
     "chronology",
-    "stable-stack",
+    "vis-timeline",
     "korean",
     "hangul"
   ],
@@ -36,7 +44,8 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "llms.txt"
   ],
   "sideEffects": false,
   "scripts": {

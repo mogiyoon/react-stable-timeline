@@ -1,0 +1,65 @@
+# @mogiyoon/react-stable-timeline
+
+> Headless-capable React timeline with stable row packing: items never jump rows while panning or zooming. Virtualized (tens of thousands of events), drag & drop, pinch zoom, keyboard-accessible, SSR-safe, TypeScript-first, ~9 KB gzip, zero deps beyond React >= 18.
+
+Install: `npm i @mogiyoon/react-stable-timeline`
+
+## Quickstart (styled component)
+
+```tsx
+import { Timeline, type TimelineItem } from "@mogiyoon/react-stable-timeline";
+
+const items: TimelineItem[] = [
+  { id: "a", label: "Kickoff", start: Date.parse("2025-01-15") },                                  // point event
+  { id: "b", label: "Beta", start: Date.parse("2025-04-01"), end: Date.parse("2025-06-30") },      // range event
+];
+
+// The wrapper must have a height. All props except `items` are optional.
+<div style={{ height: 400 }}>
+  <Timeline
+    items={items}
+    onSelect={(item) => console.log(item)}
+    onItemMove={(item, next) => {/* apply {start,end} to your state — library never mutates items */}}
+    onItemResize={(item, next) => {/* same, for range-edge resizes */}}
+    dragSnapMs={24 * 3600 * 1000}
+    cursorMs={Date.now()}
+  />
+</div>
+```
+
+Interactions out of the box: drag/one-finger pan, ⌘/Ctrl+wheel & pinch zoom, toolbar (Fit / ± / zoom %), item drag-move & edge-resize (when callbacks given), keyboard (Tab focus, Enter select, arrows move, Shift/Alt+arrows resize).
+
+## Key props (Timeline)
+
+- `items: TimelineItem<TData>[]` — `{ id, label, start(ms), end?(ms), color?, data? }`; omit `end` for point events
+- `viewportStart` / `viewportEnd` / `onViewportChange` — controlled viewport (ms); omit for uncontrolled (starts at fit)
+- `onSelect(item)` — click / Enter
+- `onItemMove(item, {start,end})`, `onItemResize(item, {start,end})`, `dragSnapMs` — enable drag & drop (controlled)
+- `virtualization` (default `true`), `overscanPx` (default 200)
+- `renderItem(ctx)` — replace only the item renderer; ctx has `startX`, `top`, `isRange`, `isDragging`, `select()`, `moveHandleProps`, resize handle props
+- `zoomStable`, `zoomMinPct`/`zoomMaxPct` (100/5000), `zoomFactor` (1.2), `hideToolbar`, `labels` (i18n), `accentColor`, `cursorMs`, `className`, `style`
+
+## Headless (full custom UI)
+
+```tsx
+import { useTimeline } from "@mogiyoon/react-stable-timeline";
+
+const tl = useTimeline({ items, onItemMove });
+// tl.visibleItems: [{ item, row, top, startX, endX, isRange, isDragging }]  (already culled)
+// tl.containerProps (spread on pannable div; give it touch-action: pan-y)
+// tl.probeProps (hidden span for font-accurate label measurement)
+// tl.scrollRef (attach to overflow-y container for row culling)
+// tl.ticks, tl.timeToPx(ms), tl.pxToTime(px), tl.rowsHeight
+// tl.fit(), tl.zoomIn(), tl.zoomOut(), tl.zoomPct, tl.setZoomPct(pct), tl.setViewport(s,e)
+// tl.moveItemBy(id, deltaMs), tl.resizeItemBy(id, "start"|"end", deltaMs)  (keyboard support)
+```
+
+Render items absolutely positioned at `left: startX, top` inside a `position: relative` container of height `tl.rowsHeight`.
+
+## Notes for coding agents
+
+- SSR/Next.js App Router safe: dist ships a "use client" banner; server render produces real positions (no browser APIs at module scope).
+- The library never mutates `items` — drag/resize callbacks hand you the proposed `{start, end}`; apply it to your own state.
+- Times are epoch milliseconds everywhere.
+
+Links: https://github.com/mogiyoon/react-stable-timeline · https://www.npmjs.com/package/@mogiyoon/react-stable-timeline

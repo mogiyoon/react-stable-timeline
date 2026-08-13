@@ -19,7 +19,7 @@ Viewport-based stacking algorithms recompute the row layout from whatever is cur
 - **SSR-safe** — ships with a `"use client"` banner for Next.js App Router; server rendering falls back gracefully where Canvas2D isn't available
 - **Zero CSS framework** — inline styles only, no Tailwind / styled-components / etc. required
 - **Controlled or uncontrolled** — pass `viewportStart` / `viewportEnd` to drive externally, or let it manage itself
-- **Tiny** — ~8 KB gzipped, tree-shakable, no dependencies beyond React
+- **Tiny** — ~9 KB gzipped, tree-shakable, no dependencies beyond React
 
 ## Install
 
