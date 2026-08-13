@@ -16,6 +16,7 @@ export function CursorLine({
   if (x < 0 || x > canvasPx) return null;
   return (
     <div
+      aria-hidden="true"
       style={{
         pointerEvents: "none",
         position: "absolute",

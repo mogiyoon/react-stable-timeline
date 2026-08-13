@@ -1,55 +1,101 @@
-import type { TimelineItem } from "../types";
-import { DOT_HEIGHT, LABEL_HEIGHT, ROW_GAP, ROW_HEIGHT } from "../constants";
+import { useState } from "react";
+import type { DragHandleProps, PositionedItem, ResizeEdge } from "../types";
+import { DOT_HEIGHT, LABEL_HEIGHT, ROW_HEIGHT } from "../constants";
 
 interface TimelineItemViewProps<TData> {
-  item: TimelineItem<TData>;
-  row: number;
-  startX: number;
-  endX: number;
-  isRange: boolean;
+  positioned: PositionedItem<TData>;
   accentColor: string;
   onSelect: (id: string) => void;
+  moveHandleProps?: DragHandleProps;
+  resizeStartHandleProps?: DragHandleProps;
+  resizeEndHandleProps?: DragHandleProps;
+  /** Time shift applied per arrow-key press, in ms. */
+  keyStepMs: number;
+  moveBy: (deltaMs: number) => void;
+  resizeBy: (edge: ResizeEdge, deltaMs: number) => void;
 }
 
 export function TimelineItemView<TData>({
-  item,
-  row,
-  startX,
-  endX,
-  isRange,
+  positioned,
   accentColor,
   onSelect,
+  moveHandleProps,
+  resizeStartHandleProps,
+  resizeEndHandleProps,
+  keyStepMs,
+  moveBy,
+  resizeBy,
 }: TimelineItemViewProps<TData>) {
-  const top = row * (ROW_HEIGHT + ROW_GAP);
+  const { item, top, startX, endX, isRange, isDragging } = positioned;
+  const [focused, setFocused] = useState(false);
   const rangeWidth = isRange ? Math.max(2, endX - startX) : 0;
   const itemColor = item.color ?? accentColor;
+  const canMove = !!moveHandleProps;
+  const canResize = !!resizeStartHandleProps;
+  const showResize = isRange && canResize;
+
+  const ariaLabel = isRange
+    ? `${item.label}, ${new Date(item.start).toLocaleDateString()} – ${new Date(item.end!).toLocaleDateString()}`
+    : `${item.label}, ${new Date(item.start).toLocaleDateString()}`;
+
+  const resizeHandleStyle = {
+    position: "absolute",
+    top: LABEL_HEIGHT,
+    width: 10,
+    height: DOT_HEIGHT,
+    cursor: "ew-resize",
+  } as const;
 
   return (
     <div
       role="button"
       tabIndex={0}
+      aria-label={ariaLabel}
       onClick={(e) => {
         e.stopPropagation();
         onSelect(item.id);
       }}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           onSelect(item.id);
+          return;
+        }
+        if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+          const delta = (e.key === "ArrowRight" ? 1 : -1) * keyStepMs;
+          if (e.altKey && canResize && isRange) {
+            e.preventDefault();
+            resizeBy("start", delta);
+          } else if (e.shiftKey && canResize && isRange) {
+            e.preventDefault();
+            resizeBy("end", delta);
+          } else if (canMove) {
+            e.preventDefault();
+            moveBy(delta);
+          }
         }
       }}
+      {...moveHandleProps}
       style={{
         position: "absolute",
-        cursor: "pointer",
-        outline: "none",
+        cursor: canMove ? "grab" : "pointer",
+        // touch-drag on a movable item must not turn into a scroll
+        touchAction: canMove || canResize ? "none" : undefined,
+        outline: focused ? `2px solid ${itemColor}` : "none",
+        outlineOffset: 2,
+        borderRadius: 2,
         left: startX,
         top,
         height: ROW_HEIGHT,
         width: Math.max(DOT_HEIGHT, rangeWidth + DOT_HEIGHT),
+        opacity: isDragging ? 0.75 : 1,
       }}
       title={item.label}
     >
       <span
+        aria-hidden="true"
         style={{
           position: "absolute",
           whiteSpace: "nowrap",
@@ -98,6 +144,20 @@ export function TimelineItemView<TData>({
             background: itemColor,
           }}
         />
+      )}
+      {showResize && (
+        <>
+          <span
+            aria-hidden="true"
+            {...resizeStartHandleProps}
+            style={{ ...resizeHandleStyle, left: -4 }}
+          />
+          <span
+            aria-hidden="true"
+            {...resizeEndHandleProps}
+            style={{ ...resizeHandleStyle, left: rangeWidth - 6 }}
+          />
+        </>
       )}
     </div>
   );

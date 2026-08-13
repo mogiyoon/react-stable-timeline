@@ -1,9 +1,8 @@
 "use client";
 
 import {
+  Fragment,
   useCallback,
-  useMemo,
-  useRef,
   useState,
   type CSSProperties,
 } from "react";
@@ -18,24 +17,14 @@ import {
   DEFAULT_ACCENT,
   DEFAULT_LABELS,
   DEFAULT_ZOOM_FACTOR,
-  ROW_GAP,
-  ROW_HEIGHT,
 } from "./constants";
-import { useContainerWidth } from "./hooks/useContainerWidth";
-import { useFitWindow } from "./hooks/useFitWindow";
-import { useMeasuredFont } from "./hooks/useMeasuredFont";
-import { usePan } from "./hooks/usePan";
-import { useRowPacking } from "./hooks/useRowPacking";
-import { useTimelineTicks } from "./hooks/useTimelineTicks";
-import { useViewport } from "./hooks/useViewport";
-import { useWheelZoom } from "./hooks/useWheelZoom";
-import { makeLabelMeasurer, toPackInput } from "./packing";
-import type { TimelineItem, TimelineProps } from "./types";
+import { useTimeline } from "./useTimeline";
+import type { TimelineProps } from "./types";
 
 export function Timeline<TData = unknown>({
   items,
-  viewportStart: viewportStartProp,
-  viewportEnd: viewportEndProp,
+  viewportStart,
+  viewportEnd,
   onViewportChange,
   cursorMs = null,
   onSelect,
@@ -48,111 +37,48 @@ export function Timeline<TData = unknown>({
   zoomStable = false,
   zoomInputTypingCommit = "immediate",
   zoomInputSpinnerCommit = "immediate",
+  onItemMove,
+  onItemResize,
+  dragSnapMs,
+  virtualization = true,
+  overscanPx,
+  renderItem,
   className,
   style,
 }: TimelineProps<TData>) {
   const labels = { ...DEFAULT_LABELS, ...(labelsProp ?? {}) };
-  const itemMap = useMemo(() => {
-    const m = new Map<string, TimelineItem<TData>>();
-    for (const it of items) m.set(it.id, it);
-    return m;
-  }, [items]);
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const probeRef = useRef<HTMLSpanElement>(null);
-
-  const canvasPx = useContainerWidth(containerRef);
-  const measureFont = useMeasuredFont(probeRef);
-  const measureLabel = useMemo(
-    () => makeLabelMeasurer(measureFont),
-    [measureFont],
-  );
-
-  const packInput = useMemo(() => toPackInput(items), [items]);
-  const fitWindow = useFitWindow(packInput);
-
-  const { viewportStart, viewportEnd, setViewport } = useViewport({
-    fitWindow,
-    viewportStartProp,
-    viewportEndProp,
+  const tl = useTimeline<TData>({
+    items,
+    viewportStart,
+    viewportEnd,
     onViewportChange,
     zoomMinPct,
     zoomMaxPct,
-  });
-
-  const viewportSpan = viewportEnd - viewportStart;
-  const pxPerMs = viewportSpan > 0 ? canvasPx / viewportSpan : 0;
-  const timeToPx = useCallback(
-    (ms: number) => (ms - viewportStart) * pxPerMs,
-    [viewportStart, pxPerMs],
-  );
-
-  const fitPxPerMs =
-    fitWindow && fitWindow.span > 0 ? canvasPx / fitWindow.span : 0;
-  const packPxPerMs = zoomStable ? fitPxPerMs : pxPerMs;
-  const { rowOf, totalRows } = useRowPacking(
-    packInput,
-    packPxPerMs,
-    measureLabel,
-  );
-
-  const handleMouseDown = usePan({
-    viewportStart,
-    viewportEnd,
-    canvasPx,
-    setViewport,
-  });
-
-  useWheelZoom({
-    containerRef,
-    viewportStart,
-    viewportEnd,
-    canvasPx,
     zoomFactor,
-    setViewport,
+    zoomStable,
+    onItemMove,
+    onItemResize,
+    dragSnapMs,
+    virtualization,
+    overscanPx,
   });
 
   const handleItemClick = useCallback(
     (id: string) => {
-      const item = itemMap.get(id);
+      const item = tl.itemMap.get(id);
       if (!item) return;
       onSelect?.(item);
     },
-    [itemMap, onSelect],
+    [tl.itemMap, onSelect],
   );
 
-  const ticks = useTimelineTicks(viewportStart, viewportEnd, canvasPx);
-
-  const handleFit = useCallback(() => {
-    if (!fitWindow) return;
-    setViewport(fitWindow.start, fitWindow.end);
-  }, [fitWindow, setViewport]);
-  const handleZoomIn = useCallback(() => {
-    const center = (viewportStart + viewportEnd) / 2;
-    const newSpan = viewportSpan / zoomFactor;
-    setViewport(center - newSpan / 2, center + newSpan / 2);
-  }, [viewportStart, viewportEnd, viewportSpan, zoomFactor, setViewport]);
-  const handleZoomOut = useCallback(() => {
-    const center = (viewportStart + viewportEnd) / 2;
-    const newSpan = viewportSpan * zoomFactor;
-    setViewport(center - newSpan / 2, center + newSpan / 2);
-  }, [viewportStart, viewportEnd, viewportSpan, zoomFactor, setViewport]);
-
-  const zoomPct = useMemo(() => {
-    if (!fitWindow || viewportSpan <= 0) return 100;
-    return Math.round((fitWindow.span / viewportSpan) * 100);
-  }, [fitWindow, viewportSpan]);
   const [zoomPctDraft, setZoomPctDraft] = useState<string | null>(null);
-  const setZoomPct = useCallback(
-    (rawPct: number) => {
-      if (!fitWindow) return;
-      const pct = Math.max(zoomMinPct, Math.min(zoomMaxPct, rawPct));
-      const center = (viewportStart + viewportEnd) / 2;
-      const newSpan = (fitWindow.span * 100) / pct;
-      setViewport(center - newSpan / 2, center + newSpan / 2);
-    },
-    [fitWindow, viewportStart, viewportEnd, setViewport, zoomMinPct, zoomMaxPct],
-  );
+
+  // Arrow-key move/resize step: the snap grid when set, else 1 % of the
+  // current viewport so the step scales with zoom.
+  const keyStepMs =
+    dragSnapMs ?? Math.max(1, Math.round(tl.viewportSpan / 100));
 
   if (items.length === 0) {
     return (
@@ -174,8 +100,6 @@ export function Timeline<TData = unknown>({
     );
   }
 
-  const rowsHeight = totalRows * (ROW_HEIGHT + ROW_GAP);
-
   const containerStyle: CSSProperties = {
     position: "relative",
     display: "flex",
@@ -191,43 +115,38 @@ export function Timeline<TData = unknown>({
       {!hideToolbar && (
         <Toolbar
           labels={labels}
-          zoomPct={zoomPct}
+          zoomPct={tl.zoomPct}
           zoomPctDraft={zoomPctDraft}
           setZoomPctDraft={setZoomPctDraft}
-          setZoomPct={setZoomPct}
+          setZoomPct={tl.setZoomPct}
           zoomMinPct={zoomMinPct}
           zoomMaxPct={zoomMaxPct}
           typingCommit={zoomInputTypingCommit}
           spinnerCommit={zoomInputSpinnerCommit}
-          onFit={handleFit}
-          onZoomIn={handleZoomIn}
-          onZoomOut={handleZoomOut}
+          onFit={tl.fit}
+          onZoomIn={tl.zoomIn}
+          onZoomOut={tl.zoomOut}
         />
       )}
 
       <div
-        ref={containerRef}
-        onMouseDown={handleMouseDown}
+        {...tl.containerProps}
         style={{
           position: "relative",
           flex: "1 1 auto",
           userSelect: "none",
           overflow: "hidden",
           cursor: "grab",
+          // horizontal touch gestures pan/pinch the timeline; vertical
+          // stays native so the rows area can still scroll
+          touchAction: "pan-y",
         }}
       >
-        <span
-          ref={probeRef}
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            visibility: "hidden",
-            pointerEvents: "none",
-            fontSize: 11,
-            whiteSpace: "nowrap",
-          }}
-        />
+        <span {...tl.probeProps} />
         <div
+          ref={tl.scrollRef}
+          role="group"
+          aria-label={`${labels.timeline} (${items.length})`}
           style={{
             position: "absolute",
             left: 0,
@@ -239,37 +158,69 @@ export function Timeline<TData = unknown>({
           }}
         >
           <div style={{ position: "relative", minHeight: "100%" }}>
-            <GridLines ticks={ticks} canvasPx={canvasPx} timeToPx={timeToPx} />
+            <GridLines
+              ticks={tl.ticks}
+              canvasPx={tl.canvasPx}
+              timeToPx={tl.timeToPx}
+            />
             <CursorLine
               cursorMs={cursorMs}
-              canvasPx={canvasPx}
-              timeToPx={timeToPx}
+              canvasPx={tl.canvasPx}
+              timeToPx={tl.timeToPx}
               accentColor={accentColor}
             />
             <div
               style={{
                 position: "relative",
-                height: rowsHeight,
-                paddingTop: 8,
+                height: tl.rowsHeight,
+                // NOT padding: absolutely-positioned items anchor to the
+                // padding box, so padding wouldn't push them down — a
+                // transparent border does, giving the top row's focus
+                // outline room instead of clipping at the scroll edge.
+                borderTop: "8px solid transparent",
               }}
             >
-              {items.map((item) => {
-                const start = item.start;
-                const end = item.end ?? item.start;
-                const isRange =
-                  item.end !== undefined && item.end !== item.start;
-                const startX = timeToPx(start);
-                const endX = isRange ? timeToPx(end) : startX;
+              {tl.visibleItems.map((positioned) => {
+                const id = positioned.item.id;
+                const moveBy = (deltaMs: number) => tl.moveItemBy(id, deltaMs);
+                const resizeBy = (edge: "start" | "end", deltaMs: number) =>
+                  tl.resizeItemBy(id, edge, deltaMs);
+                if (renderItem) {
+                  return (
+                    <Fragment key={id}>
+                      {renderItem({
+                        ...positioned,
+                        select: () => handleItemClick(id),
+                        moveHandleProps: tl.getMoveHandleProps(id),
+                        resizeStartHandleProps: tl.getResizeHandleProps(
+                          id,
+                          "start",
+                        ),
+                        resizeEndHandleProps: tl.getResizeHandleProps(
+                          id,
+                          "end",
+                        ),
+                        moveBy,
+                        resizeBy,
+                      })}
+                    </Fragment>
+                  );
+                }
                 return (
                   <TimelineItemView
-                    key={item.id}
-                    item={item}
-                    row={rowOf.get(item.id) ?? 0}
-                    startX={startX}
-                    endX={endX}
-                    isRange={isRange}
+                    key={id}
+                    positioned={positioned}
                     accentColor={accentColor}
                     onSelect={handleItemClick}
+                    moveHandleProps={tl.getMoveHandleProps(id)}
+                    resizeStartHandleProps={tl.getResizeHandleProps(
+                      id,
+                      "start",
+                    )}
+                    resizeEndHandleProps={tl.getResizeHandleProps(id, "end")}
+                    keyStepMs={keyStepMs}
+                    moveBy={moveBy}
+                    resizeBy={resizeBy}
                   />
                 );
               })}
@@ -277,7 +228,7 @@ export function Timeline<TData = unknown>({
           </div>
         </div>
 
-        <Axis ticks={ticks} canvasPx={canvasPx} timeToPx={timeToPx} />
+        <Axis ticks={tl.ticks} canvasPx={tl.canvasPx} timeToPx={tl.timeToPx} />
       </div>
     </div>
   );

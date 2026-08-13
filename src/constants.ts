@@ -8,6 +8,12 @@ export const AXIS_HEIGHT = 28;
 
 export const PAN_BUTTON = 0;
 export const DRAG_PX = 4;
+/** Touch needs a larger click/drag threshold — finger jitter. */
+export const TOUCH_DRAG_PX = 8;
+
+/** Non-label horizontal footprint of an item (dot + padding), in px. */
+export const LABEL_FIXED_PX = 24;
+export const DEFAULT_OVERSCAN_PX = 200;
 
 export const DEFAULT_ZOOM_FACTOR = 1.2;
 export const DEFAULT_ACCENT = "#6c8cff";
@@ -18,4 +24,5 @@ export const DEFAULT_LABELS: Required<TimelineLabels> = {
   zoomOut: "Zoom out",
   zoomRatio: "Zoom",
   empty: "No events",
+  timeline: "Timeline",
 };

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import type { FitWindow } from "./useFitWindow";
 
 interface UseViewportArgs {
@@ -28,18 +28,22 @@ export function useViewport({
   const isControlled =
     viewportStartProp !== undefined && viewportEndProp !== undefined;
 
-  const [innerStart, setInnerStart] = useState<number>(0);
-  const [innerEnd, setInnerEnd] = useState<number>(1);
+  // `null` until the user pans/zooms. Before that the viewport is
+  // *derived* from the fit window each render — this makes SSR output
+  // meaningful (no effect needed to initialise) and keeps the timeline
+  // following the data on item changes until the first interaction,
+  // after which the user's viewport wins (so e.g. dropping a dragged
+  // item outside the old extents doesn't snap the view back to fit).
+  const [inner, setInner] = useState<{ start: number; end: number } | null>(
+    null,
+  );
 
-  useEffect(() => {
-    if (isControlled) return;
-    if (!fitWindow) return;
-    setInnerStart(fitWindow.start);
-    setInnerEnd(fitWindow.end);
-  }, [fitWindow?.start, fitWindow?.end, isControlled]);
-
-  const rawStart = isControlled ? viewportStartProp! : innerStart;
-  const rawEnd = isControlled ? viewportEndProp! : innerEnd;
+  const rawStart = isControlled
+    ? viewportStartProp!
+    : (inner?.start ?? fitWindow?.start ?? 0);
+  const rawEnd = isControlled
+    ? viewportEndProp!
+    : (inner?.end ?? fitWindow?.end ?? 1);
   const viewportValid =
     Number.isFinite(rawStart) && Number.isFinite(rawEnd) && rawEnd > rawStart;
   const viewportStart = viewportValid ? rawStart : 0;
@@ -71,8 +75,7 @@ export function useViewport({
         ? { start, end }
         : clampViewport(start, end);
       if (!isControlled) {
-        setInnerStart(clamped.start);
-        setInnerEnd(clamped.end);
+        setInner(clamped);
       }
       onViewportChange?.(clamped.start, clamped.end);
     },

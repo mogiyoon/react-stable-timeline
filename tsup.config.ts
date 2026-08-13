@@ -9,4 +9,5 @@ export default defineConfig({
   target: "es2020",
   external: ["react", "react-dom"],
   treeshake: true,
+  onSuccess: "node ./scripts/use-client-banner.mjs",
 });

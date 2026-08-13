@@ -42,7 +42,9 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "demo": "esbuild demo/main.tsx --bundle --outfile=demo/bundle.js --servedir=demo --serve=0.0.0.0:5173 --jsx=automatic",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
@@ -55,7 +57,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tsup": "^8.3.5",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^3.2.7"
   },
   "engines": {
     "node": ">=18"

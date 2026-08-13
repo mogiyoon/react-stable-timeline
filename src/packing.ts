@@ -1,3 +1,4 @@
+import { LABEL_FIXED_PX } from "./constants";
 import type { TimelineItem } from "./types";
 
 interface PackInput {
@@ -31,7 +32,7 @@ export function packIntoRows(
   if (sorted.length === 0) return rowOf;
 
   const minTime = sorted[0]!.start;
-  const FIXED_PX = 24;
+  const FIXED_PX = LABEL_FIXED_PX;
 
   const rowEndsPx: number[] = [];
   for (const item of sorted) {
