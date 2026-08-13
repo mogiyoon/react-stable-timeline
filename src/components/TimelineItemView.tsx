@@ -26,9 +26,14 @@ export function TimelineItemView<TData>({
   moveBy,
   resizeBy,
 }: TimelineItemViewProps<TData>) {
-  const { item, top, startX, endX, isRange, isDragging } = positioned;
+  const { item, top, startX, endX, isRange, labelWidth, isDragging } =
+    positioned;
   const [focused, setFocused] = useState(false);
   const rangeWidth = isRange ? Math.max(2, endX - startX) : 0;
+  // Wide enough to wrap whichever is longer — the range bar (box ends
+  // exactly at the right dot, mirroring the left edge) or the label
+  // text (2px pad each side) — so the focus outline encloses both.
+  const boxWidth = Math.max(DOT_HEIGHT, rangeWidth, labelWidth + 4);
   const itemColor = item.color ?? accentColor;
   const canMove = !!moveHandleProps;
   const canResize = !!resizeStartHandleProps;
@@ -89,7 +94,7 @@ export function TimelineItemView<TData>({
         left: startX,
         top,
         height: ROW_HEIGHT,
-        width: Math.max(DOT_HEIGHT, rangeWidth + DOT_HEIGHT),
+        width: boxWidth,
         opacity: isDragging ? 0.75 : 1,
       }}
       title={item.label}

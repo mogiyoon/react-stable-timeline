@@ -67,15 +67,22 @@ export function useVisibleItems<TData>({
 
       const startX = timeToPx(start);
       const endX = isRange ? timeToPx(end) : startX;
+      const labelWidth = labelWidths.get(item.id) ?? 0;
       if (virtualize) {
-        const renderEndX = Math.max(
-          endX,
-          startX + (labelWidths.get(item.id) ?? 0) + LABEL_FIXED_PX,
-        );
+        const renderEndX = Math.max(endX, startX + labelWidth + LABEL_FIXED_PX);
         if (renderEndX < minX || startX > maxX) continue;
       }
 
-      out.push({ item, row, top, startX, endX, isRange, isDragging });
+      out.push({
+        item,
+        row,
+        top,
+        startX,
+        endX,
+        isRange,
+        labelWidth,
+        isDragging,
+      });
     }
     return out;
   }, [
