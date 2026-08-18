@@ -243,6 +243,7 @@ export function useTimeline<TData = unknown>({
     canvasPx,
     zoomFactor,
     setViewport,
+    scrollRef,
   });
 
   const ticks = useTimelineTicks(viewportStart, viewportEnd, canvasPx);

@@ -341,7 +341,7 @@ interface TimelineItem<TData = unknown> {
 ## Interactions
 
 - **Pan** — drag anywhere on the canvas with mouse or one finger (4 px mouse / 8 px touch threshold so taps still register as clicks). On touch the same finger also scrolls the rows vertically (each axis engages once it moves 8 px; engaged axes fling on release) — the canvas and the rows scroll container are `touch-action: none`, so the browser never takes the gesture over mid-pan.
-- **Pan with trackpad** — two-finger horizontal scroll, or `Shift` + vertical wheel.
+- **Pan with trackpad** — two-finger horizontal scroll, or `Shift` + vertical wheel. Vertical wheel scrolls the rows natively; a swipe that turns from horizontal to vertical keeps working (mixed events apply both axes).
 - **Zoom** — `⌘`/`Ctrl` + wheel, anchored at the cursor; on touch, two-finger pinch anchored at the midpoint. Toolbar `+` / `−` zoom around the center. The numeric input snaps to a percentage.
 - **Fit** — toolbar button resets to the data's full extent + 5 % padding.
 - **Select** — click an item, or focus + Enter/Space.
