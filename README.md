@@ -262,11 +262,12 @@ function MyTimeline({ items }) {
       <button onClick={tl.zoomIn}>+</button>
       <button onClick={tl.zoomOut}>−</button>
 
-      {/* the pannable / zoomable canvas */}
-      <div {...tl.containerProps} style={{ position: "relative", height: 400, overflow: "hidden" }}>
+      {/* the pannable / zoomable canvas — touch-action: none lets usePan own touch gestures */}
+      <div {...tl.containerProps} style={{ position: "relative", height: 400, overflow: "hidden", touchAction: "none" }}>
         <span {...tl.probeProps} /> {/* lets labels measure with your real font */}
 
-        {/* optional vertical scroll container — attach scrollRef to get row culling */}
+        {/* optional vertical scroll container — attach scrollRef (inside the canvas) to get
+            row culling + touch scrolling; touch-action: none is applied to it for you */}
         <div ref={tl.scrollRef} style={{ position: "absolute", inset: 0, overflowY: "auto" }}>
           <div style={{ position: "relative", height: tl.rowsHeight }}>
             {tl.visibleItems.map((p) => (
@@ -339,7 +340,7 @@ interface TimelineItem<TData = unknown> {
 
 ## Interactions
 
-- **Pan** — drag anywhere on the canvas with mouse or one finger (4 px mouse / 8 px touch threshold so taps still register as clicks).
+- **Pan** — drag anywhere on the canvas with mouse or one finger (4 px mouse / 8 px touch threshold so taps still register as clicks). On touch the same finger also scrolls the rows vertically (each axis engages once it moves 8 px; engaged axes fling on release) — the canvas and the rows scroll container are `touch-action: none`, so the browser never takes the gesture over mid-pan.
 - **Pan with trackpad** — two-finger horizontal scroll, or `Shift` + vertical wheel.
 - **Zoom** — `⌘`/`Ctrl` + wheel, anchored at the cursor; on touch, two-finger pinch anchored at the midpoint. Toolbar `+` / `−` zoom around the center. The numeric input snaps to a percentage.
 - **Fit** — toolbar button resets to the data's full extent + 5 % padding.

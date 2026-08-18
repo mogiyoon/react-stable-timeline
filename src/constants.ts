@@ -10,6 +10,12 @@ export const PAN_BUTTON = 0;
 export const DRAG_PX = 4;
 /** Touch needs a larger click/drag threshold — finger jitter. */
 export const TOUCH_DRAG_PX = 8;
+/** Direct-manipulation pointers (finger, pen) get the larger threshold
+ *  and drive vertical scrolling; a mouse only pans. */
+export const isDirectPointer = (pointerType: string): boolean =>
+  pointerType !== "mouse";
+export const dragThresholdFor = (pointerType: string): number =>
+  isDirectPointer(pointerType) ? TOUCH_DRAG_PX : DRAG_PX;
 
 /** Non-label horizontal footprint of an item (dot + padding), in px. */
 export const LABEL_FIXED_PX = 24;

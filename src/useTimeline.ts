@@ -2,6 +2,7 @@
 
 import {
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   type CSSProperties,
@@ -68,13 +69,23 @@ export interface UseTimelineResult<TData = unknown> {
   /** Attach to the pannable canvas element (width + wheel + pan). */
   containerRef: RefObject<HTMLDivElement | null>;
   /** Spread on the canvas element: `{ref, onPointerDown}`. Give that
-   *  element `touch-action: pan-y` so horizontal touch gestures reach
-   *  the pan/pinch handlers while vertical scrolling stays native. */
+   *  element `touch-action: none` — one finger pans horizontally and
+   *  scrolls `scrollRef` vertically (both fling on release), two fingers pinch;
+   *  the browser never competes for the gesture. If you don't attach
+   *  `scrollRef`, vertical drags scroll the nearest scrollable ancestor
+   *  or the page instead. A release fling ends on any pointer/wheel
+   *  input; a programmatic viewport change during a fling (controlled
+   *  mode) is overridden by the next frame — call it after, or on
+   *  input. */
   containerProps: {
     ref: RefObject<HTMLDivElement | null>;
     onPointerDown: (e: ReactPointerEvent) => void;
   };
-  /** Attach to the vertical scroll container for row culling (optional). */
+  /** Attach to the vertical scroll container for row culling and touch
+   *  scrolling (optional). Render it inside the canvas element: it then
+   *  gets `touch-action: none` applied automatically (browsers only
+   *  consult touch-action up to the nearest scroll container, so the
+   *  canvas's value alone wouldn't reach touches inside it). */
   scrollRef: RefObject<HTMLDivElement | null>;
   /** Spread on a hidden span inside the canvas so labels are measured
    *  with the *real* inherited font instead of the fallback. */
@@ -205,7 +216,24 @@ export function useTimeline<TData = unknown>({
     viewportEnd,
     canvasPx,
     setViewport,
+    scrollRef,
   });
+
+  // touch-action is only consulted up to the nearest scroll container,
+  // so the canvas's `none` doesn't reach touches inside the rows
+  // scroller. Set it there too when the scroller lives inside the
+  // canvas — a headless consumer who forgot it would otherwise get the
+  // browser's own scrolling racing usePan (device-only breakage).
+  useEffect(() => {
+    if (!hasItems) return;
+    const el = scrollRef.current;
+    const canvas = containerRef.current;
+    if (!el || !canvas || !canvas.contains(el) || el.style.touchAction) return;
+    el.style.touchAction = "none";
+    return () => {
+      el.style.touchAction = "";
+    };
+  }, [hasItems]);
 
   useWheelZoom({
     containerRef,

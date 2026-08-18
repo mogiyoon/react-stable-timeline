@@ -137,9 +137,11 @@ export function Timeline<TData = unknown>({
           userSelect: "none",
           overflow: "hidden",
           cursor: "grab",
-          // horizontal touch gestures pan/pinch the timeline; vertical
-          // stays native so the rows area can still scroll
-          touchAction: "pan-y",
+          // usePan owns every touch gesture: horizontal pan, vertical
+          // scroll of the rows container (+ fling), pinch zoom. `none`
+          // keeps the browser from claiming the touch mid-gesture and
+          // cutting the pan short with a pointercancel.
+          touchAction: "none",
         }}
       >
         <span {...tl.probeProps} />
@@ -155,6 +157,12 @@ export function Timeline<TData = unknown>({
             bottom: AXIS_HEIGHT,
             overflowY: "auto",
             overflowX: "hidden",
+            // touch-action is only consulted up to the *nearest scroll
+            // container* (Pointer Events §touch-action), so the outer
+            // canvas's `none` doesn't reach touches that land in here —
+            // the browser would still native-scroll this box and cancel
+            // the pan. Repeat it on the scroller itself.
+            touchAction: "none",
           }}
         >
           <div style={{ position: "relative", minHeight: "100%" }}>

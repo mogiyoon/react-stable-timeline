@@ -13,7 +13,9 @@ interface UseViewportArgs {
 interface UseViewportResult {
   viewportStart: number;
   viewportEnd: number;
-  setViewport: (start: number, end: number) => void;
+  /** Returns the span actually applied (zoom-clamped when uncontrolled;
+   *  the request itself when controlled — the parent decides). */
+  setViewport: (start: number, end: number) => { start: number; end: number };
   isControlled: boolean;
 }
 
@@ -78,6 +80,7 @@ export function useViewport({
         setInner(clamped);
       }
       onViewportChange?.(clamped.start, clamped.end);
+      return clamped;
     },
     [clampViewport, isControlled, onViewportChange],
   );
