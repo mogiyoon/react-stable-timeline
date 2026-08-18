@@ -46,9 +46,9 @@ import { useTimeline } from "@mogiyoon/react-stable-timeline";
 
 const tl = useTimeline({ items, onItemMove });
 // tl.visibleItems: [{ item, row, top, startX, endX, isRange, isDragging }]  (already culled)
-// tl.containerProps (spread on pannable div; give it touch-action: pan-y)
+// tl.containerProps (spread on pannable div; give it touch-action: none)
 // tl.probeProps (hidden span for font-accurate label measurement)
-// tl.scrollRef (attach to overflow-y container for row culling)
+// tl.scrollRef (attach to overflow-y container inside the canvas: row culling + touch scrolling)
 // tl.ticks, tl.timeToPx(ms), tl.pxToTime(px), tl.rowsHeight
 // tl.fit(), tl.zoomIn(), tl.zoomOut(), tl.zoomPct, tl.setZoomPct(pct), tl.setViewport(s,e)
 // tl.moveItemBy(id, deltaMs), tl.resizeItemBy(id, "start"|"end", deltaMs)  (keyboard support)

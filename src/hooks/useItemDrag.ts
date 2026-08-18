@@ -4,7 +4,7 @@ import {
   useState,
   type PointerEvent as ReactPointerEvent,
 } from "react";
-import { DRAG_PX, TOUCH_DRAG_PX } from "../constants";
+import { dragThresholdFor } from "../constants";
 import type {
   DragHandleProps,
   ResizeEdge,
@@ -81,7 +81,7 @@ export function useItemDrag<TData>({
       e.stopPropagation();
 
       const pointerId = e.pointerId;
-      const threshold = e.pointerType === "touch" ? TOUCH_DRAG_PX : DRAG_PX;
+      const threshold = dragThresholdFor(e.pointerType);
       const originX = e.clientX;
       const start = item.start;
       const end = item.end ?? item.start;

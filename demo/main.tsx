@@ -128,6 +128,7 @@ function FullDemo() {
         "아이템 <b>드래그 = 이동</b>(1일 스냅) · 막대 <b>양끝 = 리사이즈</b> · 짧은 클릭 = 선택",
         "팬/줌/드래그 중 아이템이 <b>다른 행으로 튀지 않는지</b> (stable packing)",
         "빨간 세로선 = <code>cursorMs</code>(현재 시각)",
+        "<b>터치</b>: 한 손가락 가로 = 팬, 세로 = 행 스크롤, 놓으면 양쪽 다 관성, 두 손가락 = 핀치 줌",
       ]}
     >
       <div style={{ height: 280, ...boxStyle }}>
@@ -295,6 +296,7 @@ function VirtDemo() {
         "세로 스크롤/팬 시 DOM 수가 일정 범위를 유지하는지",
         "overscan 0px으로 줄이고 빠르게 팬하면 가장자리 <b>팝인</b>이 보이는지 (600px에선 사라짐)",
         "50,000개도 시도해보세요",
+        "<b>터치</b>: 세로 플릭 → 관성 스크롤이 끝(위/아래)에서 멈추는지, 맨 위에서 아래로 당기면 <b>페이지</b>가 스크롤되는지",
       ]}
     >
       <div ref={boxRef} style={{ height: 260, ...boxStyle }}>
@@ -396,7 +398,7 @@ function HeadlessDemo() {
       <div
         {...tl.containerProps}
         style={{ position: "relative", height: 150, overflow: "hidden", background: "#0f172a",
-          borderRadius: 10, cursor: "grab", userSelect: "none", touchAction: "pan-y" }}
+          borderRadius: 10, cursor: "grab", userSelect: "none", touchAction: "none" }}
       >
         <span {...tl.probeProps} />
         <div style={{ position: "absolute", top: 6, right: 8, display: "flex", gap: 6, alignItems: "center", zIndex: 1 }}>
